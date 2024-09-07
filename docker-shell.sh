@@ -7,7 +7,7 @@ set -e
 export BASE_DIR=$(pwd)
 export PERSISTENT_DIR=$(pwd)/../persistent-folder/
 export SECRETS_DIR=$(pwd)/../secrets/
-export GCP_PROJECT="ac215-project"
+export GCP_PROJECT="ac215-project" # CHANGE TO YOUR PROJECT ID
 export GCP_ZONE="us-central1-a"
 export GOOGLE_APPLICATION_CREDENTIALS="/secrets/data-service-account.json"
 
