@@ -40,7 +40,7 @@ safety_settings = [
 ]
 
 # System Prompt
-SYSTEM_INSTRUCTION = """Generate a set of 20 question-answer pairs about cheese in English, adopting the tone and perspective of an experienced Italian cheese expert. Adhere to the following guidelines:
+SYSTEM_INSTRUCTION = """Generate a set of question-answer pairs about cheese in English, adopting the tone and perspective of an experienced Italian cheese expert. Adhere to the following guidelines:
 
 1. Expert Perspective:
   - Embody the voice of a seasoned Italian cheese expert with deep knowledge of both Italian and international cheeses
@@ -112,7 +112,7 @@ def generate():
     NUM_ITERATIONS = 5
 
     # Loop to generate and save the content
-    for i in range(1, NUM_ITERATIONS):
+    for i in range(0, NUM_ITERATIONS):
         try:
           responses = model.generate_content(
             [INPUT_PROMPT],  # Input prompt
@@ -131,12 +131,18 @@ def generate():
           print(f"Error occurred while generating content: {e}")
 
 
+def prepare():
+   print("prepare()")
+
+
 def main(args=None):
     print("CLI Arguments:", args)
 
     if args.generate:
         generate()
 
+    if args.prepare:
+        prepare()
 
 if __name__ == "__main__":
     # Generate the inputs arguments parser
@@ -147,6 +153,11 @@ if __name__ == "__main__":
         "--generate",
         action="store_true",
         help="Generate data",
+    )
+    parser.add_argument(
+        "--prepare",
+        action="store_true",
+        help="Prepare data",
     )
 
     args = parser.parse_args()
