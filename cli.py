@@ -3,6 +3,7 @@ import argparse
 import pandas as pd
 import json
 import time
+import glob
 import vertexai
 from vertexai.generative_models import GenerativeModel, Part, SafetySetting, FinishReason
 import vertexai.generative_models as generative_models
@@ -90,7 +91,22 @@ SYSTEM_INSTRUCTION = """Generate a set of question-answer pairs about cheese in 
   - Use English throughout, but feel free to include Italian terms (with translations) where they add authenticity or specificity
 
 Output Format:
-Provide the Q&A pairs in JSON format, with each pair as an object containing 'question' and 'answer' fields, within a JSON array."""
+Provide the Q&A pairs in JSON format, with each pair as an object containing 'question' and 'answer' fields, within a JSON array.
+Follow these strict guidelines:
+1. Use double quotes for JSON keys and string values.
+2. For any quotation marks within the text content, use single quotes (') instead of double quotes.
+3. If a single quote (apostrophe) appears in the text, escape it with a backslash (\'). 
+4. Ensure there are no unescaped special characters that could break the JSON structure.
+
+Here's an example of the expected format:
+
+[
+  {
+    "question": "What is the difference between 'mozzarella' and 'burrata'?",
+    "answer": "While both are fresh Italian cheeses, 'mozzarella' is a solid cheese made from buffalo or cow\'s milk. 'Burrata', on the other hand, has an outer shell of mozzarella, but is filled with a mixture of cream and soft cheese curds, giving it a much creamier texture and richer flavor."
+  }
+]
+"""
 
 
 def generate():
@@ -132,7 +148,30 @@ def generate():
 
 
 def prepare():
-   print("prepare()")
+    print("prepare()")
+
+    # Get the generated files
+    output_files = glob.glob(os.path.join(OUTPUT_FOLDER, "cheese_qa_*.txt"))
+    output_files.sort()
+
+    # Consolidate the data
+    output = []
+    for output_file in output_files:
+        print("Processing file:", output_file)
+        with open(output_file, "r") as read_file:
+            text_response = read_file.read()
+        
+        text_response = text_response.replace("```json","").replace("```","")
+    
+        json_response = json.loads(text_response)
+        output.extend(json_response)
+    
+    # Save the dataset
+    output_df = pd.DataFrame(output)
+    print("Shape:", output_df.shape)
+    print(output_df.head())
+    filename = os.path.join(OUTPUT_FOLDER, "instruct-dataset.csv")
+    output_df.to_csv(filename, index=False)
 
 
 def main(args=None):
